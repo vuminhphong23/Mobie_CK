@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "825549254388",
+    "project_id": "country-app-cb075",
+    "storage_bucket": "country-app-cb075.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:825549254388:android:51c423d32250080b18b8a1",
+        "android_client_info": {
+          "package_name": "com.example.app_travel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7_oH3hpSNwsF0d4JkV3jUD1rhvvX8jYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
