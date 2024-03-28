@@ -17,14 +17,13 @@ class HomeAppBar extends StatefulWidget {
 
 class _HomeAppBarState extends State<HomeAppBar> {
   TextEditingController locationController = TextEditingController();
-  String location = "Vietnam";
-
+  String location ="Vietnam";
   GlobalKey<AutoCompleteTextFieldState<String>> key = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    locationController.text = location;
+    locationController.text = 'Vietnam';
     _loadCountries();
   }
   List<CountryData> _allCountries = [];

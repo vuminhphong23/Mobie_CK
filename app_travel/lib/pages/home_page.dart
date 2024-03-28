@@ -17,24 +17,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var category = [
-    'Best Places',
+    'Best Country Places',
+    'Best City Places',
     'Favourites',
   ];
-  final Random random = Random();
 
-  String getRandomImagePath() {
-    int randomIndex = random.nextInt(6);
-    return 'images/city${randomIndex + 1}.jpg';
-  }
-  int getRandomIndex() {
-    int randomIndex = random.nextInt(10);
-    return randomIndex;
-  }
+
+
   List<CountryData> _allCountries = [];
   List<CityData> _allCities = [];
 
   bool _isLoading = true;
-  String location = '';
+  String location = 'Vietnam';
   @override
   void initState() {
     super.initState();
@@ -114,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                                     color: Colors.black,
                                     borderRadius: BorderRadius.circular(15),
                                     image: DecorationImage(
-                                      image: AssetImage(getRandomImagePath()),
+                                      image: AssetImage('images/city${index+1}.jpg'),
                                       fit: BoxFit.cover,
                                       colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.7), BlendMode.dstATop),
                                     ),
@@ -161,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                     padding: EdgeInsets.all(8),
                     child: Row(
                       children: [
-                        for(int i = 0; i < 2; i++)
+                        for(int i = 0; i < 3; i++)
                           Container(
                             margin: EdgeInsets.symmetric(horizontal: 10),
                             padding: EdgeInsets.all(10),
@@ -217,7 +211,7 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.black,
                                   borderRadius: BorderRadius.circular(15),
                                   image: DecorationImage(
-                                    image: AssetImage(getRandomImagePath()),
+                                    image: AssetImage('images/city${index+6}.jpg'),
                                     fit: BoxFit.cover,
                                     opacity: 0.8,
                                   ),
@@ -263,7 +257,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     } else {
-
                       return SizedBox();
                     }
                   },

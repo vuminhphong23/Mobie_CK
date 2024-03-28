@@ -1,10 +1,16 @@
+import 'dart:async';
 import 'package:app_travel/models/city_model.dart';
+import 'package:app_travel/widgets/app_bar_city.dart';
 import 'package:flutter/material.dart';
+import '../models/timezone.dart';
 import '../models/weather.dart';
-import '../widgets/post_app_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../widgets/weather_item.dart';
-import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
+import 'clock.dart';
 
 class CityDetail extends StatefulWidget {
   final String cityName;
@@ -19,6 +25,10 @@ class CityDetail extends StatefulWidget {
 class _CityDetailState extends State<CityDetail> {
   late Future<CityData> _cityData;
   late Future<Weather> _weatherData;
+  late TimeInfo _timeInfo;
+  late String _randomImagePath;
+  late bool _isFavorite = false;
+  String? userId;
 
 
 
@@ -38,11 +48,47 @@ class _CityDetailState extends State<CityDetail> {
     }
   }
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+
+
   @override
   void initState() {
     super.initState();
-    _cityData = CityData.fetchCityData(widget.cityName);
-    _weatherData = Weather.getWeatherData(widget.countryName);
+    initializeData();
+
+  }
+  Future<void> _fetchTimeInfo(String name) async {
+    if(readTimezonesFromFile(name) == 'null'){
+      setState(() {
+        _timeInfo = TimeInfo(
+          datetime: '...',
+        );
+      });
+      return;
+    }
+    final response = await http.get(Uri.parse('http://worldtimeapi.org/api/timezone/'+'${readTimezonesFromFile(name)}'+'.txt'));
+
+    if (response.statusCode == 200) {
+      List<String> data = response.body.split('\n');
+      String time = '';
+      for (String line in data) {
+        if (line.startsWith('datetime:')) {
+          time = line.substring(10);
+          break;
+        }
+      }
+      DateTime dateTime = DateTime.parse(time.replaceAll('T', ' ').split('.')[0]);
+
+      String formattedDateTime = '${dateTime.day}/${dateTime.month}/${dateTime.year} - ${dateTime.hour}:${dateTime.minute}:${dateTime.second}';
+      setState(() {
+        _timeInfo = TimeInfo(
+          datetime: formattedDateTime,
+        );
+      });
+    } else {
+      throw Exception('Failed to load time information');
+    }
   }
 
   final Shader linearGradient = const LinearGradient(
@@ -52,8 +98,47 @@ class _CityDetailState extends State<CityDetail> {
   final Random random = Random();
 
   String getRandomImagePath() {
-    int randomIndex = random.nextInt(6); // Sinh số ngẫu nhiên từ 0 đến 5
-    return 'images/city${randomIndex + 1}.jpg'; // Trả về đường dẫn của hình ảnh
+    int randomIndex = random.nextInt(11);
+    return 'images/city${randomIndex + 1}.jpg';
+  }
+
+  Future<bool> isCityFavourite(String cityName) async {
+    try {
+      // Check if the country is already in the favorites list
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('favourite_cities')
+          .where('name', isEqualTo: cityName)
+          .get();
+
+      return querySnapshot.docs.isNotEmpty;
+    } catch (error) {
+      // Handle error if any
+      print('Error while checking country in favourites: $error');
+      return false;
+    }
+  }
+
+  Future<void> _checkUserId() async {
+    // Get userId from Firebase Authentication
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        userId = user.uid;
+      });
+    }
+  }
+
+  Future<void> initializeData() async {
+    _cityData = CityData.fetchCityData(widget.countryName,widget.cityName);
+    _weatherData = Weather.getWeatherData(widget.countryName);
+    _timeInfo = TimeInfo(datetime: "...");
+    _randomImagePath = getRandomImagePath();
+    Timer.periodic(Duration(seconds: 1), (Timer t) => _fetchTimeInfo(widget.countryName));
+    _isFavorite = await isCityFavourite(widget.cityName);
+    _checkUserId();
+    setState(() {});
   }
 
   @override
@@ -61,7 +146,7 @@ class _CityDetailState extends State<CityDetail> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(getRandomImagePath()),
+          image: AssetImage(_randomImagePath),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.9), BlendMode.dstATop),
         ),
@@ -70,7 +155,7 @@ class _CityDetailState extends State<CityDetail> {
         backgroundColor: Colors.transparent,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(90),
-          child: PostAppBar(name: widget.cityName),
+          child: AppBarCity(name: widget.cityName),
         ),
         body: FutureBuilder(
           future: _cityData,
@@ -111,12 +196,13 @@ class _CityDetailState extends State<CityDetail> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 40),
+                                    padding: const EdgeInsets.only(left: 75),
                                     child: Text(
-                                      DateFormat('dd/MM/yyyy - HH:mm:ss').format(DateTime.now()),
-                                      style: const TextStyle(
+                                      _timeInfo.datetime != "..." ? _timeInfo.datetime : '',
+                                      style: TextStyle(
                                         color: Color(0xff04225b),
-                                        fontSize: 25,
+                                        fontSize: 23,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -249,22 +335,88 @@ class _CityDetailState extends State<CityDetail> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "4.5",
-                                    style: TextStyle(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.red,
-                                    ),
+                              InkWell(
+                                onTap: () async {
+                                  if (!_isFavorite) {
+                                    try {
+                                      // Save country data to Firestore
+                                      await _firestore
+                                          .collection('users')
+                                          .doc(userId)
+                                          .collection('favourite_cities')
+                                          .add({
+                                        'name': data.name,
+                                        'countryName': data.countryName,
+                                        'stateCode': data.stateCode,
+                                        'population': data.population,
+                                      });
+
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('City added to favourites')),
+                                      );
+
+                                      setState(() {
+                                        _isFavorite = true; // Mark as added to favourites
+                                      });
+                                    } catch (error) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Failed to add City to favourites')),
+                                      );
+                                      print('Failed to add City to favourites: $error');
+                                    }
+                                  } else {
+                                    try {
+                                      // Get reference of document to delete from Firestore
+                                      QuerySnapshot querySnapshot = await _firestore
+                                          .collection('users')
+                                          .doc(userId)
+                                          .collection('favourite_cities')
+                                          .where('name', isEqualTo: data.name)
+                                          .get();
+
+                                      querySnapshot.docs.forEach((doc) async {
+                                        // Delete document from Firestore
+                                        await _firestore
+                                            .collection('users')
+                                            .doc(userId)
+                                            .collection('favourite_cities')
+                                            .doc(doc.id)
+                                            .delete();
+                                      });
+
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('City removed from favourites')),
+                                      );
+
+                                      setState(() {
+                                        _isFavorite = false; // Mark as removed from favourites
+                                      });
+                                    } catch (error) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Failed to remove city from favourites')),
+                                      );
+                                      print('Failed to remove city from favourites: $error');
+                                    }
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 6,
+                                      )
+                                    ],
                                   ),
-                                  Icon(
-                                    Icons.star,
-                                    color: Colors.amber,
-                                    size: 30,
+                                  child: Icon(
+                                    Icons.favorite,
+                                    color: _isFavorite ? Colors.red : Colors.grey,
+                                    size: 28,
                                   ),
-                                ],
+                                ),
                               ),
                             ],
                           ),
@@ -282,7 +434,7 @@ class _CityDetailState extends State<CityDetail> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(15),
                                   child: Image.asset(
-                                    getRandomImagePath(),
+                                    'images/city2.jpg',
                                     fit: BoxFit.cover,
                                     width: 110,
                                     height: 90,
@@ -294,7 +446,7 @@ class _CityDetailState extends State<CityDetail> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(15),
                                   child: Image.asset(
-                                    getRandomImagePath(),
+                                    'images/city3.jpg',
                                     fit: BoxFit.cover,
                                     width: 110,
                                     height: 90,
@@ -308,7 +460,7 @@ class _CityDetailState extends State<CityDetail> {
                                   color: Colors.black,
                                   borderRadius: BorderRadius.circular(15),
                                   image: DecorationImage(
-                                    image: AssetImage(getRandomImagePath()),
+                                    image: AssetImage('images/city4.jpg'),
                                     fit: BoxFit.cover,
                                     colorFilter: ColorFilter.mode(
                                       Colors.black.withOpacity(0.4),

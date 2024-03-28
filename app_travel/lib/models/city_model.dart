@@ -50,35 +50,37 @@
     //   }
     // }
 
-    static Future<CityData> fetchCityData(String cityName) async {
-      String apiUrl = 'https://countriesnow.space/api/v0.1/countries/population/cities';
-      try {
-        http.Response response = await http.get(Uri.parse(apiUrl));
+    static Future<CityData> fetchCityData(String countryName, String cityName) async {
+      var result = 'https://countriesnow.space/api/v0.1/countries/states/q?country=' + countryName;
+      var url = Uri.parse(result);
 
-        if (response.statusCode == 200) {
-          Map<String, dynamic> data = jsonDecode(response.body);
+      var response = await http.get(url);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        var statesData = jsonData['data']['states'] as List;
 
-          for (var cityData in data['data']) {
-            if (cityName.toLowerCase().contains(cityData['city'].toString().toLowerCase())) {
-              var population = await fetchCityPopulation(cityName);
-              var countryName = cityData['country'];
-              var stateCode = await fetchState(countryName, cityName);
-
-              return CityData(
-                name: cityName,
-                countryName: countryName,
-                stateCode: stateCode,
-                population: population,
-              );
-            }
+        List<CityData> states = statesData.map((stateData) {
+          return CityData(
+            name: stateData['name'],
+            countryName: jsonData['data']['name'],
+            // Lấy tên quốc gia từ phản hồi JSON
+            stateCode: stateData['state_code'],
+            population: {},
+          );
+        }).toList();
+        for (var s in states) {
+          if (s.name == cityName) {
+            return s;
           }
-          throw Exception('City not found: $cityName');
-        } else {
-          throw Exception('Failed to load data: ${response.statusCode}');
         }
-      } catch (error) {
-        throw Exception('Error: $error');
+
       }
+      return CityData(
+        name: cityName,
+        countryName: countryName,
+        stateCode: '',
+        population: {},
+      );
     }
 
 
@@ -133,12 +135,12 @@
               return s.stateCode;
             }
           }
-          return '123';
+          return 'Null';
         } else {
           throw Exception('Failed to fetch states: ${response.reasonPhrase}');
         }
       } catch (error) {
-        throw Exception('Failed to fetch states: $error');
+        return 'Null';
       }
     }
     static Future<Map<String, int>> fetchCityPopulation(String cityName) async {
@@ -168,7 +170,7 @@
           throw Exception('Failed to load data: ${response.statusCode}');
         }
       } catch (error) {
-        throw Exception('Error: $error');
+        return {'year': 0, 'population': 0};
       }
     }
   }

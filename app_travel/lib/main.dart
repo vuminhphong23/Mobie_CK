@@ -1,9 +1,12 @@
 import 'dart:io';
-import 'package:app_travel/widgets/welcome_screen.dart';
+import 'package:app_travel/pages/clock.dart';
+import 'package:app_travel/login/welcome_screen.dart';
+import 'package:app_travel/pages/favorites_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'login/signin_screen.dart';
 import 'models/interfaces.dart';
 import 'pages/home_page.dart';
 import 'pages/country.dart';
@@ -52,7 +55,8 @@ class _MyAppState extends State<MyApp> {
       routes: {
         "homePage": (context) => HomePage(),
         "settingsPage": (context) => SettingsPage(),
-        // "favoritesPage"  : (context) => CityPopulationPage(countryName: 'Albania'),
+        'loginPage': (context) => SignInScreen(),
+        "favoritesPage"  : (context) => FavoritePage(),
         // "productPage": (context) => ProductView(),
 
         // "orderDetail": (context) => ChiTietHoaDon(),

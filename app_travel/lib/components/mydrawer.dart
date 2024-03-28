@@ -98,9 +98,8 @@ class MyDrawer extends StatelessWidget {
                         onTap: () => {
                           FirebaseAuth.instance.signOut().then((value) {
                             print("Signed Out");
-                            Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => SignInScreen()));
-                        }),
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignInScreen()));
+                          }),
                         },
                         child: SettingItem(
                           title: "Logout",
@@ -108,11 +107,10 @@ class MyDrawer extends StatelessWidget {
                           bgColor: Colors.red.shade100,
                           iconColor: Colors.red,
                           onTap: () => {
-                          FirebaseAuth.instance.signOut().then((value) {
-                          print("Signed Out");
-                          Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => SignInScreen()));
-                          }),
+                            FirebaseAuth.instance.signOut().then((value) {
+                              print("Signed Out");
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignInScreen()));
+                            }),
                           },
                         ),
                       ),
