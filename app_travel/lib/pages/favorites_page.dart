@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:app_travel/models/city_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'city.dart';
 import 'country.dart';
 
@@ -11,8 +11,25 @@ class FavoritePage extends StatefulWidget {
 
 class _FavoritePageState extends State<FavoritePage> {
   bool _searchByCity = false;
+  late String userId;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUserId();
+  }
+
+  Future<void> _checkUserId() async {
+    // Get userId from Firebase Authentication
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        userId = user.uid;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +88,7 @@ class _FavoritePageState extends State<FavoritePage> {
 
   Widget _buildCountryList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collectionGroup('favourite_countries').snapshots(),
+      stream: _firestore.collection('users').doc(userId).collection('favourite_countries').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -97,7 +114,7 @@ class _FavoritePageState extends State<FavoritePage> {
 
   Widget _buildCityList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collectionGroup('favourite_cities').snapshots(),
+      stream: _firestore.collection('users').doc(userId).collection('favourite_cities').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
