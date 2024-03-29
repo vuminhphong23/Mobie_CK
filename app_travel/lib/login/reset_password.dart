@@ -55,8 +55,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                         return null;
                       },
                       decoration: InputDecoration(
-                        label: const Text('Password'),
-                        hintText: 'Enter Password',
+                        label: const Text('Email'),
+                        hintText: 'Enter email',
                         hintStyle: const TextStyle(
                           color: Colors.black26,
                         ),
@@ -77,7 +77,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     const SizedBox(
                       height: 20,
                     ),
-                    firebaseUIButton(context, "Reset Password", () {
+                    firebaseUIButton(context, "Sent Password", () {
                       FirebaseAuth.instance
                           .sendPasswordResetEmail(email: _emailTextController.text)
                           .then((value) => Navigator.of(context).pop());

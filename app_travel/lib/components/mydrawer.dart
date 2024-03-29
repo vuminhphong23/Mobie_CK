@@ -1,14 +1,41 @@
+import 'package:app_travel/login/welcome_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../login/signin_screen.dart';
 import '../models/interfaces.dart';
 import 'setting_items.dart';
 
 
-class MyDrawer extends StatelessWidget {
+class MyDrawer extends StatefulWidget {
+
+  @override
+  State<MyDrawer> createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  late String userName = '';
+  Future<String> getUserName(String email) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(email)
+          .get();
+
+      if (userDoc.exists) {
+        Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+        return userData?['username'] ?? '';
+      } else {
+        return '';
+      }
+    } catch (e) {
+      print('Error getting user name: $e');
+      return '';
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Consumer<UserInterface>(
@@ -32,26 +59,44 @@ class MyDrawer extends StatelessWidget {
                           ),
                         ),
                         SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Admin',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                        Container(
+                          width: 150,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FutureBuilder<String>(
+                                future: getUserName(currentUser.email!),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return CircularProgressIndicator(); // Hiển thị loading khi đang lấy dữ liệu
+                                  } else {
+                                    if (snapshot.hasError) {
+                                      return Text('Error getting username'); // Hiển thị thông báo lỗi nếu có lỗi xảy ra
+                                    } else {
+                                      return Text(
+                                        snapshot.data ?? '', // Sử dụng dữ liệu trả về từ snapshot
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
                               ),
-                            ),
-                            Text(
-                              'shoemaker@gmail.com',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                              Text(
+                                currentUser.email!,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
                               ),
-                            ),
-                          ],
+
+
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -95,22 +140,27 @@ class MyDrawer extends StatelessWidget {
                         ),
                       ),
                       InkWell(
-                        onTap: () => {
-                          FirebaseAuth.instance.signOut().then((value) {
-                            print("Signed Out");
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignInScreen()));
-                          }),
+                        onTap: () async {
+                          await FirebaseAuth.instance.signOut();
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) =>  SignInScreen()),
+                                (Route<dynamic> route) => false,
+                          );
                         },
+
                         child: SettingItem(
                           title: "Logout",
                           icon: Ionicons.log_out,
                           bgColor: Colors.red.shade100,
                           iconColor: Colors.red,
-                          onTap: () => {
-                            FirebaseAuth.instance.signOut().then((value) {
-                              print("Signed Out");
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignInScreen()));
-                            }),
+                          onTap: () async {
+                            await FirebaseAuth.instance.signOut();
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (context) =>  SignInScreen()),
+                                  (Route<dynamic> route) => false,
+                            );
                           },
                         ),
                       ),

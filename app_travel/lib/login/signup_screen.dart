@@ -1,8 +1,7 @@
 
 import 'package:app_travel/pages/home_page.dart';
 import 'package:app_travel/reusable_widgets/reusable_widget.dart';
-import 'package:app_travel/untils/color_utils.dart';
-import 'package:app_travel/login/welcome_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -10,80 +9,7 @@ import '../untils/theme.dart';
 import '../widgets/custom_scaffold.dart';
 import 'signin_screen.dart';
 
-// class SignUpScreen extends StatefulWidget {
-//   const SignUpScreen({Key? key}) : super(key: key);
-//
-//   @override
-//   _SignUpScreenState createState() => _SignUpScreenState();
-// }
-//
-// class _SignUpScreenState extends State<SignUpScreen> {
-//   TextEditingController _passwordTextController = TextEditingController();
-//   TextEditingController _emailTextController = TextEditingController();
-//   TextEditingController _userNameTextController = TextEditingController();
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       extendBodyBehindAppBar: true,
-//       appBar: AppBar(
-//         backgroundColor: Colors.transparent,
-//         elevation: 0,
-//         title: const Text(
-//           "Sign Up",
-//           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-//         ),
-//       ),
-//       body: Container(
-//           width: MediaQuery.of(context).size.width,
-//           height: MediaQuery.of(context).size.height,
-//           decoration: BoxDecoration(
-//               gradient: LinearGradient(colors: [
-//                 hexStringToColor("CB2B93"),
-//                 hexStringToColor("9546C4"),
-//                 hexStringToColor("5E61F4")
-//               ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
-//           child: SingleChildScrollView(
-//               child: Padding(
-//                 padding: EdgeInsets.fromLTRB(20, 120, 20, 0),
-//                 child: Column(
-//                   children: <Widget>[
-//                     const SizedBox(
-//                       height: 20,
-//                     ),
-//                     reusableTextField("Enter UserName", Icons.person_outline, false,
-//                         _userNameTextController),
-//                     const SizedBox(
-//                       height: 20,
-//                     ),
-//                     reusableTextField("Enter Email Id", Icons.person_outline, false,
-//                         _emailTextController),
-//                     const SizedBox(
-//                       height: 20,
-//                     ),
-//                     reusableTextField("Enter Password", Icons.lock_outlined, true,
-//                         _passwordTextController),
-//                     const SizedBox(
-//                       height: 20,
-//                     ),
-//                     firebaseUIButton(context, "Sign Up", () {
-//                       FirebaseAuth.instance
-//                           .createUserWithEmailAndPassword(
-//                           email: _emailTextController.text,
-//                           password: _passwordTextController.text)
-//                           .then((value) {
-//                         print("Created New Account");
-//                         Navigator.push(context,
-//                             MaterialPageRoute(builder: (context) => HomePage()));
-//                       }).onError((error, stackTrace) {
-//                         print("Error ${error.toString()}");
-//                       });
-//                     })
-//                   ],
-//                 ),
-//               ))),
-//     );
-//   }
-// }
+
 
 
 class SignUpScreen extends StatefulWidget {
@@ -99,6 +25,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController _emailTextController = TextEditingController();
   TextEditingController _userNameTextController = TextEditingController();
   bool agreePersonalData = true;
+
+  Future<bool> checkUserExists(String email) async {
+    try {
+      // Truy cập vào collection "Users" và lấy thông tin của tài khoản có email tương ứng
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection("Users")
+          .where('email', isEqualTo: email)
+          .get();
+
+      // Kiểm tra nếu có bất kỳ tài khoản nào có cùng email với email truyền vào
+      return querySnapshot.docs.isNotEmpty;
+    } catch (error) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('The email address is already in use by another account.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return false;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
@@ -272,18 +230,69 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: firebaseUIButton(context, "Sign Up", () {
-                      FirebaseAuth.instance
-                          .createUserWithEmailAndPassword(
-                          email: _emailTextController.text,
-                          password: _passwordTextController.text)
-                          .then((value) {
-                        print("Created New Account");
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => HomePage()));
-                      }).onError((error, stackTrace) {
-                        print("Error ${error.toString()}");
-                      });
-                    })
+                            FirebaseAuth.instance
+                                .createUserWithEmailAndPassword(
+                                email: _emailTextController.text,
+                                password: _passwordTextController.text)
+                                .then((userCredential) {
+                              FirebaseFirestore.instance
+                                  .collection("Users")
+                                  .doc(userCredential.user!.email)
+                                  .set({
+                                'username': _userNameTextController.text,
+                                'phone': '',
+                                'sex': '',
+                                'address': '',
+                              })
+                                  .then((_) {
+                                print("Created New Account");
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => HomePage()),
+                                );
+                              })
+                                  .catchError((error) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Error'),
+                                      content: Text('Enter missing information or the email address is already used by another account.'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('OK'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              });
+                            })
+                                .catchError((error) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Error'),
+                                    content: Text('Enter missing information or the email address is already used by another account.'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            });
+
+                        }),
                       ),
                       const SizedBox(
                         height: 30.0,

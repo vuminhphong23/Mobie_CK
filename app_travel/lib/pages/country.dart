@@ -153,6 +153,7 @@ class _CountryDetailState extends State<CountryDetail> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    //Thời tiết
                     Container(
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -299,6 +300,7 @@ class _CountryDetailState extends State<CountryDetail> {
                       ),
                     ),
                     SizedBox(height: 20),
+                    //Quốc gia
                     Container(
                       height: MediaQuery.of(context).size.height / 2.3,
                       padding: EdgeInsets.all(20),
@@ -323,7 +325,7 @@ class _CountryDetailState extends State<CountryDetail> {
                                 onTap: () async {
                                   if (!_isFavorite) {
                                     try {
-                                      // Save country data to Firestore
+
                                       await _firestore
                                           .collection('users')
                                           .doc(userId)
@@ -362,7 +364,7 @@ class _CountryDetailState extends State<CountryDetail> {
                                           .get();
 
                                       querySnapshot.docs.forEach((doc) async {
-                                        // Delete document from Firestore
+
                                         await _firestore
                                             .collection('users')
                                             .doc(userId)
@@ -534,7 +536,7 @@ class _CountryDetailState extends State<CountryDetail> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('City Not Found'),
+                      title: Text('Country Not Found'),
                       content: Text('${widget.countryName} currently has no data.'),
                       actions: <Widget>[
                         TextButton(

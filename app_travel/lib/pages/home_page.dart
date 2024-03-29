@@ -77,6 +77,7 @@ class _HomePageState extends State<HomePage> {
               : SingleChildScrollView(
             child: Column(
               children: [
+                //List country gợi ý
                 Row(
                   children: [
                     Expanded(
@@ -149,6 +150,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 SizedBox(height: 20,),
+                //Category
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Padding(
@@ -200,6 +202,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 10,),
+                //List cities gợi ý theo location
                 ListView.builder(
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: 6,

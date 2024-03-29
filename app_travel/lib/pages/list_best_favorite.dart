@@ -70,7 +70,7 @@ class _ListFavoritePageState extends State<ListFavoritePage> {
           return Center(child: Text('No favorites found'));
         }
 
-        // Tạo một Map để đếm số lần xuất hiện của mỗi quốc gia
+        // Tạo một map để đếm số lần xuất hiện của mỗi quốc gia
         Map<String, int> countryCountMap = {};
         snapshot.data!.docs.forEach((DocumentSnapshot document) {
           var data = document.data() as Map<String, dynamic>;
@@ -84,7 +84,7 @@ class _ListFavoritePageState extends State<ListFavoritePage> {
 
         List<MapEntry<String, int>> sortedCountries = countryCountMap.entries.toList();
         sortedCountries.sort((a, b) => b.value.compareTo(a.value));
-
+        sortedCountries = sortedCountries.take(10).toList();
         List<Widget> countryCards = [];
         sortedCountries.forEach((entry) {
           String country = entry.key;
@@ -138,6 +138,7 @@ class _ListFavoritePageState extends State<ListFavoritePage> {
         sortedCities.sort((a, b) => b.value.compareTo(a.value));
 
         List<Widget> cityCards = [];
+        sortedCities = sortedCities.take(10).toList();
         sortedCities.forEach((entry) {
           String city = entry.key;
           int count = entry.value;

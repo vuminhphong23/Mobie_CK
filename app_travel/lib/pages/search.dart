@@ -143,7 +143,7 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> _loadCitiesForSelectedCountry(String countryName) async {
     _allCities = await CityData.fetchListStates(countryName);
   }
-
+//kq tìm kiếm list countries
   Widget _buildCountryResultsList() {
     return _searchResultsCountries.isEmpty
         ? Center(child: Text('No results found'))
@@ -182,7 +182,7 @@ class _SearchPageState extends State<SearchPage> {
       },
     );
   }
-
+//kq tìm kiếm list cities
   Widget _buildCityResultsList() {
     return _searchResultsCities.isEmpty
         ? Center(child: Text('No results found'))
