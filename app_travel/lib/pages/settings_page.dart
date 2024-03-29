@@ -25,22 +25,26 @@ class _SettingsPageState extends State<SettingsPage> {
     return Consumer<UserInterface>(
         builder: (context, ui, child) {
           return Scaffold(
-            drawer: MyDrawer(),
+            // drawer: MyDrawer(),
             appBar: AppBar(
-              backgroundColor: ui.appBarColor,
-              title: Text("Settings",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
-              leading: Builder(
-                builder: (BuildContext builderContext) {
-                  return IconButton(
-                    onPressed: () => Scaffold.of(builderContext).openDrawer(),
-                    icon: const Icon(Ionicons.apps_outline),
-                    color: Colors.white,
-                  );
-                },
-              ),
-              leadingWidth: 80,
+              title: Text('Settings',style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),),
+              backgroundColor: Colors.transparent,
             ),
+            // appBar: AppBar(
+            //   backgroundColor: ui.appBarColor,
+            //   title: Text("Settings",
+            //     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),),
+            //   leading: Builder(
+            //     builder: (BuildContext builderContext) {
+            //       return IconButton(
+            //         onPressed: () => Scaffold.of(builderContext).openDrawer(),
+            //         icon: const Icon(Ionicons.apps_outline),
+            //         color: Colors.white,
+            //       );
+            //     },
+            //   ),
+            //   leadingWidth: 80,
+            // ),
             body: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(30),
@@ -186,27 +190,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                     ),
-                    // const Spacer(),
-                    const SizedBox(height: 20),
 
-                    SizedBox(
-                      width: double.infinity,
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 50,
-                            width: 50,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.orange.shade100,
-                            ),
-                            child: Icon(
-                              Ionicons.earth,
-                              color: Colors.orange,
-                            ),
-                          ),
-                        ],
-                      ),
+                    const SizedBox(height: 20),
+                    SettingItem(
+                      title: "Languages",
+                      icon: Ionicons.earth,
+                      bgColor: Colors.orange.shade100,
+                      iconColor: Colors.orange,
+                      onTap: () {},
                     ),
                     const SizedBox(height: 20),
                     SettingItem(
@@ -281,7 +272,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-            bottomNavigationBar: HomeBottomBar(),
+            // bottomNavigationBar: HomeBottomBar(),
           );
         }
     );

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../models/wall_post.dart';
+import '../widgets/wall_post.dart';
 
 class PostComment extends StatefulWidget {
   const PostComment({super.key});

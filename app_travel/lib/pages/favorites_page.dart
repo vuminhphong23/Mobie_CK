@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,13 +32,28 @@ class _FavoritePageState extends State<FavoritePage> {
       });
     }
   }
+  final Random random = Random();
+  List<int> imageIndexes = List<int>.generate(11, (index) => index + 1);
+  //xáo trộn ảnh
+  void shuffleImageIndexes() {
+    imageIndexes.shuffle();
+  }
+
+  String getRandomImagePath() {
+    if (imageIndexes.isEmpty) {
+      imageIndexes = List<int>.generate(11, (index) => index + 1);
+      shuffleImageIndexes();
+    }
+    int randomIndex = imageIndexes.removeAt(0);
+    return 'images/city$randomIndex.jpg';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('images/city2.jpg'),
+          image: AssetImage('images/city9.jpg'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.9), BlendMode.dstATop),
         ),
@@ -54,7 +71,7 @@ class _FavoritePageState extends State<FavoritePage> {
             children: [
               Row(
                 children: [
-                  Text('Filter by: ', style: TextStyle(fontSize: 22)),
+                  Text('Filter by: ', style: TextStyle(fontSize: 22,fontWeight: FontWeight.w400)),
                   DropdownButton<bool>(
                     value: _searchByCity,
                     onChanged: (bool? value) {
@@ -128,15 +145,46 @@ class _FavoritePageState extends State<FavoritePage> {
           return Center(child: Text('No favorites found'));
         }
 
+        List<Map<String, dynamic>> cityDataList = snapshot.data!.docs.map((DocumentSnapshot document) {
+          var data = document.data() as Map<String, dynamic>;
+          return {
+            'name': data['name'],
+            'countryName': data['countryName'],
+          };
+        }).toList();
+
+        // Nhóm thành phố theo quốc gia
+        Map<String, List<Map<String, dynamic>>> groupedByCountry = {};
+        cityDataList.forEach((cityData) {
+          String country = cityData['countryName'];
+          groupedByCountry.putIfAbsent(country, () => []);
+          groupedByCountry[country]!.add(cityData);
+        });
+
+        // Sắp xếp các quốc gia theo chữ cái đầu
+        List<String> sortedCountries = groupedByCountry.keys.toList();
+        sortedCountries.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+
+        // Sắp xếp các thành phố trong mỗi nhóm quốc gia theo chữ cái đầu của tên thành phố
+        groupedByCountry.forEach((country, cities) {
+          cities.sort((a, b) => (a['name'] as String).toLowerCase().compareTo((b['name'] as String).toLowerCase()));
+        });
+
+        // Tạo danh sách các widget thành phố đã sắp xếp
+        List<Widget> sortedCityWidgets = [];
+        sortedCountries.forEach((country) {
+          sortedCityWidgets.add(Text(country, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,)));
+          sortedCityWidgets.addAll(groupedByCountry[country]!.map((cityData) => _buildCityCard(cityData['name'], cityData['countryName'])));
+        });
+
         return ListView(
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            var data = document.data() as Map<String, dynamic>;
-            return _buildCityCard(data['name'], data['countryName']);
-          }).toList(),
+          children: sortedCityWidgets,
         );
       },
     );
   }
+
+
 
   Widget _buildCountryCard(String countryName) {
     return Card(
@@ -150,7 +198,16 @@ class _FavoritePageState extends State<FavoritePage> {
             style: TextStyle(color: Colors.white, fontSize: 22),
           ),
         ),
-        title: Text(countryName),
+        title: Text(countryName,style: TextStyle(fontWeight: FontWeight.w500),),
+        trailing: ClipRRect(
+          borderRadius: BorderRadius.circular(50), // Độ cong của góc
+          child: Image.asset(
+            getRandomImagePath(),
+            width: 45,
+            height: 45,
+            fit: BoxFit.cover,
+          ),
+        ),
         onTap: () {
           Navigator.push(
             context,
@@ -173,13 +230,22 @@ class _FavoritePageState extends State<FavoritePage> {
             style: TextStyle(color: Colors.white, fontSize: 22),
           ),
         ),
-        title: Text(cityName),
+        title: Text(cityName,style: TextStyle(fontWeight: FontWeight.w500),),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(countryName != null ? countryName : ''),
             SizedBox(height: 5),
           ],
+        ),
+        trailing: ClipRRect(
+          borderRadius: BorderRadius.circular(50), // Độ cong của góc
+          child: Image.asset(
+            getRandomImagePath(),
+            width: 45,
+            height: 45,
+            fit: BoxFit.cover,
+          ),
         ),
         onTap: () {
           Navigator.push(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../pages/cities_of_country.dart';
 import '../pages/comment_page.dart';
 
 class AppBarCity extends StatelessWidget {
@@ -30,7 +29,7 @@ class AppBarCity extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white,
+                        color: Colors.black26,
                         blurRadius: 6,
                       )
                     ]

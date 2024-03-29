@@ -31,10 +31,19 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   final Random random = Random();
+  List<int> imageIndexes = List<int>.generate(11, (index) => index + 1);
+  //xáo trộn ảnh
+  void shuffleImageIndexes() {
+    imageIndexes.shuffle();
+  }
 
   String getRandomImagePath() {
-    int randomIndex = random.nextInt(6);
-    return 'images/city${randomIndex + 1}.jpg';
+    if (imageIndexes.isEmpty) {
+      imageIndexes = List<int>.generate(11, (index) => index + 1);
+      shuffleImageIndexes();
+    }
+    int randomIndex = imageIndexes.removeAt(0);
+    return 'images/city$randomIndex.jpg';
   }
 
 
@@ -61,7 +70,7 @@ class _SearchPageState extends State<SearchPage> {
             children: [
               Row(
                 children: [
-                  Text('Search by: ',style: TextStyle(fontSize: 22),),
+                  Text('Filter by: ',style: TextStyle(fontSize: 22),),
                   DropdownButton<bool>(
                     value: _searchByCity,
                     onChanged: (bool? value) {
@@ -146,7 +155,7 @@ class _SearchPageState extends State<SearchPage> {
           margin: EdgeInsets.symmetric(horizontal: 18, vertical: 6),
           child: ListTile(
             leading: Container(
-              width: 50, height: 50,
+              width: 45, height: 45,
               child: CircleAvatar(
                 backgroundColor: Colors.blue,
                 child: Text(
@@ -155,13 +164,13 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
             ),
-            title: Text(_searchResultsCountries[index].country),
+            title: Text(_searchResultsCountries[index].country,style: TextStyle(fontWeight: FontWeight.w500),),
             trailing: ClipRRect(
               borderRadius: BorderRadius.circular(50), // Độ cong của góc
               child: Image.asset(
                 getRandomImagePath(),
-                width: 52,
-                height: 52,
+                width: 48,
+                height: 48,
                 fit: BoxFit.cover,
               ),
             ),
@@ -185,7 +194,7 @@ class _SearchPageState extends State<SearchPage> {
           margin: EdgeInsets.symmetric(horizontal: 18, vertical: 6),
           child: ListTile(
             leading: Container(
-              width: 50, height: 50,
+              width: 45, height: 45,
               child: CircleAvatar(
                 backgroundColor: Colors.blue,
                 child: Text(
@@ -194,14 +203,14 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
             ),
-            title: Text(_searchResultsCities[index].name),
+            title: Text(_searchResultsCities[index].name,style: TextStyle(fontWeight: FontWeight.w500),),
             subtitle: Text(_searchResultsCities[index].countryName),
             trailing: ClipRRect(
               borderRadius: BorderRadius.circular(50), // Độ cong của góc
               child: Image.asset(
                 getRandomImagePath(),
-                width: 52,
-                height: 52,
+                width: 48,
+                height: 48,
                 fit: BoxFit.cover,
               ),
             ),

@@ -46,15 +46,15 @@ class _CityListScreenState extends State<CityListScreen> {
   final Random random = Random();
 
   String getRandomImagePath() {
-    int randomIndex = random.nextInt(6); // Sinh số ngẫu nhiên từ 0 đến 5
-    return 'images/city${randomIndex + 1}.jpg'; // Trả về đường dẫn của hình ảnh
+    int randomIndex = random.nextInt(6);
+    return 'images/city${randomIndex + 1}.jpg';
   }
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(getRandomImagePath()),
+          image: AssetImage('images/city4.jpg'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.9), BlendMode.dstATop),
         ),
@@ -136,7 +136,7 @@ class _CityListScreenState extends State<CityListScreen> {
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white,
+                        color: Colors.black26,
                         blurRadius: 6,
                       )
                     ]
@@ -187,7 +187,7 @@ class _CityListScreenState extends State<CityListScreen> {
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white,
+                        color: Colors.black26,
                         blurRadius: 6,
                       )
                     ]

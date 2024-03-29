@@ -58,14 +58,14 @@
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         var statesData = jsonData['data']['states'] as List;
+        var populationCounts = await fetchCityPopulation(cityName);
 
         List<CityData> states = statesData.map((stateData) {
           return CityData(
             name: stateData['name'],
             countryName: jsonData['data']['name'],
-            // Lấy tên quốc gia từ phản hồi JSON
             stateCode: stateData['state_code'],
-            population: {},
+            population:  populationCounts,
           );
         }).toList();
         for (var s in states) {
@@ -153,7 +153,7 @@
           Map<String, int> cityPopulationData = {};
 
           for (var cityData in data['data']) {
-            if (cityName.toLowerCase().contains(cityData['city'].toString().toLowerCase())) {
+            if (cityName.toLowerCase().contains(cityData['city'].toString().toLowerCase()) || cityData['city'].toString().toLowerCase().contains(cityName.toLowerCase())) {
               var populationCounts = cityData['populationCounts'] as List;
               if (populationCounts.isNotEmpty) {
                 var latestPopulation = populationCounts.last;

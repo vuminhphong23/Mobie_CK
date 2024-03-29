@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../pages/cities_of_country.dart';
 import '../pages/comment_page.dart';
 
-class PostAppBar extends StatelessWidget {
+class AppBarCountry extends StatelessWidget {
   final String name;
-  const PostAppBar({required this.name});
+  const AppBarCountry({required this.name});
 
 
   @override
@@ -30,7 +30,7 @@ class PostAppBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white,
+                      color: Colors.black26,
                       blurRadius: 6,
                     )
                   ]
@@ -101,7 +101,7 @@ class PostAppBar extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white,
+                        color: Colors.black26,
                         blurRadius: 6,
                       )
                     ]

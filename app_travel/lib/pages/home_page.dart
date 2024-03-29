@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:app_travel/models/city_model.dart';
+import 'package:app_travel/pages/list_best_favorite.dart';
 import 'package:app_travel/widgets/home_app_bar.dart';
 import 'package:app_travel/widgets/home_bottom_bar.dart';
 import 'package:app_travel/pages/country.dart';
@@ -19,7 +20,6 @@ class _HomePageState extends State<HomePage> {
   var category = [
     'Best Country Places',
     'Best City Places',
-    'Favourites',
   ];
 
 
@@ -154,30 +154,47 @@ class _HomePageState extends State<HomePage> {
                   child: Padding(
                     padding: EdgeInsets.all(8),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        for(int i = 0; i < 3; i++)
-                          Container(
-                            margin: EdgeInsets.symmetric(horizontal: 10),
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 4,
-                                  )
-                                ]
-                            ),
-                            child: Text(
-                              category[i],
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black
+                        for(int i = 0; i < 2; i++)
+                          InkWell(
+                            onTap: (){
+                              if (i == 0) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ListFavoritePage(index: i)),
+                                );
+                              } else if (i == 1) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) =>
+                                      ListFavoritePage(index: i)),
+                                );
+                              }
+                            },
+                            child: Container(
+                              margin: EdgeInsets.symmetric(horizontal: 10),
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 4,
+                                    )
+                                  ]
+                              ),
+                              child: Text(
+                                category[i],
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black
+                                ),
                               ),
                             ),
-                          )
+                          ),
                       ],
                     ),
                   ),
