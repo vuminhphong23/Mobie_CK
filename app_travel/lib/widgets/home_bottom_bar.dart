@@ -1,9 +1,8 @@
-import 'package:app_travel/models/interfaces.dart';
-import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
-import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/interfaces.dart';
 
 class HomeBottomBar extends StatelessWidget {
   const HomeBottomBar({super.key});

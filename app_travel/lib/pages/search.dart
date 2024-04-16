@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:app_travel/models/city_model.dart';
 import 'package:flutter/material.dart';
+import '../models/city_model.dart';
 import '../models/country_model.dart';
 import 'city.dart';
 import 'country.dart';

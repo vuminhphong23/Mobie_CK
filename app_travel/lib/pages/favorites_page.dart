@@ -105,7 +105,7 @@ class _FavoritePageState extends State<FavoritePage> {
 
   Widget _buildCountryList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection('users').doc(userId).collection('favourite_countries').snapshots(),
+      stream: _firestore.collection('favourite').doc(userId).collection('favourite_countries').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -131,7 +131,7 @@ class _FavoritePageState extends State<FavoritePage> {
 
   Widget _buildCityList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection('users').doc(userId).collection('favourite_cities').snapshots(),
+      stream: _firestore.collection('favourite').doc(userId).collection('favourite_cities').snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');

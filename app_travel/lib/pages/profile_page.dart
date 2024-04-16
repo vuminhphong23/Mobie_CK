@@ -109,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   text: userData['phone'],
                   iconData: Icons.phone,
                   sectionName: 'Phone',
-                  onPressed: () => editField('Phone'),
+                  onPressed: () => editField('phone'),
                 ),
                 MyTextBox(
                   text: userData['sex'],

@@ -88,7 +88,7 @@ class _CountryDetailState extends State<CountryDetail> {
     try {
       // Check if the country is already in the favorites list
       QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
+          .collection('favourite')
           .doc(userId)
           .collection('favourite_countries')
           .where('country', isEqualTo: countryName)
@@ -327,7 +327,7 @@ class _CountryDetailState extends State<CountryDetail> {
                                     try {
 
                                       await _firestore
-                                          .collection('users')
+                                          .collection('favourite')
                                           .doc(userId)
                                           .collection('favourite_countries')
                                           .add({
@@ -357,7 +357,7 @@ class _CountryDetailState extends State<CountryDetail> {
                                     try {
                                       // Get reference of document to delete from Firestore
                                       QuerySnapshot querySnapshot = await _firestore
-                                          .collection('users')
+                                          .collection('favourite')
                                           .doc(userId)
                                           .collection('favourite_countries')
                                           .where('country', isEqualTo: data.country)
@@ -366,7 +366,7 @@ class _CountryDetailState extends State<CountryDetail> {
                                       querySnapshot.docs.forEach((doc) async {
 
                                         await _firestore
-                                            .collection('users')
+                                            .collection('favourite')
                                             .doc(userId)
                                             .collection('favourite_countries')
                                             .doc(doc.id)
@@ -543,6 +543,7 @@ class _CountryDetailState extends State<CountryDetail> {
                           onPressed: () {
                             Navigator.of(context).pop();
                             Navigator.of(context).pop();
+
                           },
                           child: Text('OK'),
                         ),

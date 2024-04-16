@@ -1,16 +1,13 @@
 
-import 'package:app_travel/pages/home_page.dart';
-import 'package:app_travel/reusable_widgets/reusable_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import '../pages/home_page.dart';
+import '../reusable_widgets/reusable_widget.dart';
 import '../untils/theme.dart';
 import '../widgets/custom_scaffold.dart';
 import 'signin_screen.dart';
-
-
-
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

@@ -1,15 +1,13 @@
-import 'dart:math';
 
-import 'package:app_travel/models/city_model.dart';
-import 'package:app_travel/pages/list_best_favorite.dart';
-import 'package:app_travel/widgets/home_app_bar.dart';
-import 'package:app_travel/widgets/home_bottom_bar.dart';
-import 'package:app_travel/pages/country.dart';
 import 'package:flutter/material.dart';
-
 import '../components/mydrawer.dart';
+import '../models/city_model.dart';
 import '../models/country_model.dart';
+import '../widgets/home_app_bar.dart';
+import '../widgets/home_bottom_bar.dart';
 import 'city.dart';
+import 'country.dart';
+import 'list_best_favorite.dart';
 
 class HomePage extends StatefulWidget {
   @override

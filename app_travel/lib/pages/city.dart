@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:app_travel/models/city_model.dart';
-import 'package:app_travel/widgets/app_bar_city.dart';
+import '../models/city_model.dart';
+import '../widgets/app_bar_city.dart';
 import 'package:flutter/material.dart';
 import '../models/timezone.dart';
 import '../models/weather.dart';
@@ -106,7 +106,7 @@ class _CityDetailState extends State<CityDetail> {
     try {
       // Check if the country is already in the favorites list
       QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
+          .collection('favourite')
           .doc(userId)
           .collection('favourite_cities')
           .where('name', isEqualTo: cityName)
@@ -341,7 +341,7 @@ class _CityDetailState extends State<CityDetail> {
                                     try {
                                       // Save country data to Firestore
                                       await _firestore
-                                          .collection('users')
+                                          .collection('favourite')
                                           .doc(userId)
                                           .collection('favourite_cities')
                                           .add({
@@ -368,7 +368,7 @@ class _CityDetailState extends State<CityDetail> {
                                     try {
                                       // Get reference of document to delete from Firestore
                                       QuerySnapshot querySnapshot = await _firestore
-                                          .collection('users')
+                                          .collection('favourite')
                                           .doc(userId)
                                           .collection('favourite_cities')
                                           .where('name', isEqualTo: data.name)
@@ -377,7 +377,7 @@ class _CityDetailState extends State<CityDetail> {
                                       querySnapshot.docs.forEach((doc) async {
                                         // Delete document from Firestore
                                         await _firestore
-                                            .collection('users')
+                                            .collection('favourite')
                                             .doc(userId)
                                             .collection('favourite_cities')
                                             .doc(doc.id)
